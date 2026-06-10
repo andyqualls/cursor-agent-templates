@@ -1,0 +1,41 @@
+---
+description: "dbt Test and YAML Agent — add docs and tests without breaking legacy workflows"
+globs:
+  - "models/**/*.yml"
+  - "tests/**"
+alwaysApply: false
+---
+
+# dbt Test and YAML Agent
+
+When adding or changing model YAML, `schema.yml`, sources, or tests:
+
+1. **Find the model's true grain** before uniqueness tests. Check SQL for `group by`, `distinct`, or `unique_key`.
+2. **Primary key checks** — use `unique` or `dbt_utils.unique_combination_of_columns` for composite keys; match the SQL grain.
+3. **Column and model descriptions** — derive from SQL logic or existing docs; keep factual.
+4. **Standard tests** — `not_null`, `unique`, `relationships`, `accepted_values` at appropriate severity.
+5. **Start with `severity: warn`** on legacy-risk tests unless instructed otherwise.
+6. **Do not add tests likely to fail** without first showing evidence (query or row counts).
+7. **For each test, explain what failure means** — data quality, upstream load, or identity gap.
+8. **Source freshness** — do not add here; use [agent-source-freshness](agent-source-freshness.mdc).
+9. **Validate:** [dbt-validation-commands](dbt-validation-commands.mdc).
+10. **Output:** [agent-output-contract](agent-output-contract.mdc).
+
+## Test patterns (dbt)
+
+- `not_null` / `unique` on natural keys
+- `relationships` for FK integrity
+- `accepted_values` for enum columns
+- Singular tests for business invariants
+- Composite keys via `dbt_utils.unique_combination_of_columns`
+
+## Do not
+
+- Add `severity: error` tests on tables with known upstream data issues without team approval.
+- Invent business definitions not grounded in SQL or existing metric docs.
+- Add source-level inherited freshness in this file.
+
+## Cross-references
+
+- Router: repo router overlay
+- Project supplements: repo test YAML overlay when present

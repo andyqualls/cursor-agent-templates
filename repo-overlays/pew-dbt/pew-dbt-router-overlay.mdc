@@ -26,6 +26,8 @@ Extends [agent-router-base](agent-router-base.mdc). Invoke specialists **explici
 
 - PR review: [pew-dbt-pr-reviewer-overlay](pew-dbt-pr-reviewer-overlay.mdc)
 - Audit: [pew-dbt-audit-overlay](pew-dbt-audit-overlay.mdc)
+- Documentation: [pew-dbt-documentation-overlay](pew-dbt-documentation-overlay.mdc)
+- Test YAML: [pew-dbt-test-yaml-overlay](pew-dbt-test-yaml-overlay.mdc)
 
 ## Shared rules (`alwaysApply: true`)
 

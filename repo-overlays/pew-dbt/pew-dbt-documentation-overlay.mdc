@@ -1,0 +1,32 @@
+---
+description: Pew dbt documentation supplements — doc map and conventions (repo overlay bootstrap)
+alwaysApply: false
+---
+
+# Pew dbt documentation overlay
+
+Extends [agent-documentation](agent-documentation.mdc) for Pew Digital Data Mart (`ddm-dbt`).
+
+## Doc conventions
+
+- **`CURRENT.md`** is a stable orientation index — not for sprint notes or task tracking.
+- ADR template: `docs/decisions/README.md`
+
+## Doc locations
+
+| Purpose | Path |
+|---------|------|
+| Orientation | `CURRENT.md` |
+| Repo map | `docs/repo-map.md` |
+| Metrics | `docs/metrics/` |
+| Runbooks | `docs/runbooks/` |
+| Dashboards | `docs/dashboards/` |
+| Operations | `docs/operations/` |
+| Templates | `templates/` |
+| Decisions | `docs/decisions/` |
+
+## Pew-specific doc context
+
+- GA4 / content metrics: `ga4-metrics.mdc`
+- Dashboard consumers: `dashboard-support.mdc`
+- Do not add sprint-level notes to `CURRENT.md`.

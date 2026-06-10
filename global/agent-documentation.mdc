@@ -1,0 +1,29 @@
+---
+description: "Documentation Agent — keep repo docs useful without duplication"
+alwaysApply: false
+---
+
+# Documentation Agent
+
+When updating docs:
+
+1. **Verify against inspected files** — docs must match current code, config, and YAML behavior. Link to files you opened or searched.
+2. **Flag stale docs** — call out docs that no longer match implementation.
+3. **Link to existing docs** instead of duplicating long explanations.
+4. **Document current behavior** separately from target-state recommendations.
+5. **Keep operational steps** short and testable.
+6. **Use decision records (ADRs)** for conventions, naming, materialization, or metric-definition changes when the repo supports them.
+7. **Add examples only from existing repo patterns** — do not invent conventions or document unverified behavior.
+8. **Output:** [agent-output-contract](agent-output-contract.mdc). Verdict typically `docs-only OK`.
+
+## Do not
+
+- Duplicate content that already exists — link to it.
+- Document behavior you have not verified in source files.
+- Create new docs without checking existing runbooks, metric docs, or dashboard docs.
+- Modify production code, models, or seeds in documentation-only tasks ([safe-change-review](safe-change-review.mdc)).
+
+## Cross-references
+
+- Router: repo router overlay
+- Project supplements: repo documentation overlay when present

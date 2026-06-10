@@ -1,0 +1,20 @@
+---
+description: Pew dbt test YAML supplements — legacy warnings and repo patterns (repo overlay bootstrap)
+alwaysApply: false
+---
+
+# Pew dbt test YAML overlay
+
+Extends [agent-test-yaml](agent-test-yaml.mdc) for Pew Digital Data Mart (`ddm-dbt`).
+
+## Pew test patterns
+
+- `not_null` / `unique` on natural keys — `severity: warn` for legacy tables
+- `relationships` for FK integrity — `severity: warn`; known orphans documented in audit
+- Singular tests in `tests/singular/` for business invariants
+- Known pre-existing warnings: `docs/dbt_assessment_audit.md` "Known test warnings" section
+
+## Pew grain / key context
+
+- Content marts: composite keys often include `sitecore_item_id` + date — see `ga4-metrics.mdc`
+- Conventions: `dbt-conventions.mdc`
