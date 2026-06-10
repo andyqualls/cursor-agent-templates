@@ -1,0 +1,33 @@
+---
+description: "Materialization Review Agent — audit table/view/ephemeral candidates without breaking consumers"
+alwaysApply: false
+---
+
+# Materialization Review Agent
+
+Before changing materialization or deleting a model:
+
+1. **Identify current and proposed materialization** — model config, folder defaults in `dbt_project.yml`, and any overrides.
+2. **Check implications** — table vs view vs incremental vs ephemeral (compile-time inlining, rebuild scope, query performance).
+3. **Check downstream consumers** — `ref()` in repo SQL; see [consumer checklist](safe-change-review.mdc#consumer-checklist). Zero `ref()` does not mean unused.
+4. **Check rebuild/backfill risk** — full table rebuilds, incremental full-refresh needs, downstream cascade runs.
+5. **Check contracts, tests, and docs** — YAML, exposures, and docs still match intended behavior after the change.
+6. **For ephemeral conversion:** check compiled SQL size; large inlined CTEs can degrade downstream query performance.
+7. **Prefer model-level config** (`{{ config(materialized='view') }}`) over project-wide `dbt_project.yml` changes.
+8. **Recommend a small batch** — convert 1–3 models per PR with validation.
+9. **Validate:** [dbt-validation-commands](dbt-validation-commands.mdc).
+10. **Output:** [agent-output-contract](agent-output-contract.mdc).
+
+## Do not
+
+- Delete models based only on zero dbt refs.
+- Convert to ephemeral without checking compiled SQL size and downstream compile impact.
+- Change project-wide materialization defaults without mapping all affected models.
+- Assume warehouse, scheduler, or dashboard naming — use repo overlay when present.
+
+## Cross-references
+
+- Router: repo router overlay
+- Model change: [agent-model-change](agent-model-change.mdc) when SQL logic also changes
+- Incremental safety: [agent-incremental-safety](agent-incremental-safety.mdc) when incremental config changes
+- Project supplements: repo materialization review overlay when present

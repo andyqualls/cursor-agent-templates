@@ -1,0 +1,30 @@
+---
+description: "Dashboard Impact Agent — protect reporting and BI consumers from contract-breaking changes"
+globs:
+  - "models/**/marts/**"
+  - "models/**/*exposure*"
+alwaysApply: false
+---
+
+# Dashboard Impact Agent
+
+Before approving a change that touches reporting-facing models, marts, facts, or exposures:
+
+1. **Identify reporting-facing models** — marts, facts, exposure YAML, and models documented as BI/reporting outputs.
+2. **Inspect downstream graph and metadata** — `ref()` lineage, exposures, and reporting-consumer docs in the repo.
+3. **Classify contract changes** — column names/types/aliases, grains, filters, metric definitions, aggregation logic.
+4. **Flag breaking changes** — renamed/dropped columns and grain shifts break dashboards and ad hoc reports silently.
+5. **Reporting validation:** before/after row counts, key metric totals, schema diff when metrics or schema may change.
+6. **Output:** [agent-output-contract](agent-output-contract.mdc). Verdict may include `needs dashboard review`.
+
+## Do not
+
+- Do not say "no dashboard impact" unless you inspected the downstream model graph and the repo's reporting-consumer documentation or exposure metadata.
+- Assume BI tool names or dashboard mappings — use repo overlay when present.
+
+## Cross-references
+
+- Router: repo router overlay
+- Consumers: [safe-change-review consumer checklist](safe-change-review.mdc#consumer-checklist)
+- Validation: [dbt-validation-commands](dbt-validation-commands.mdc) — add metric totals and exposure checks for reporting models
+- Project supplements: repo dashboard impact overlay when present

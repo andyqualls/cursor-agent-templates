@@ -1,0 +1,17 @@
+---
+description: Pew dbt dashboard impact supplements — Looker, Civis, mart mappings (repo overlay bootstrap)
+globs:
+  - "models/**/marts/**"
+  - "models/**/*exposure*"
+alwaysApply: false
+---
+
+# Pew dbt dashboard impact overlay
+
+Extends [agent-dashboard-impact](agent-dashboard-impact.mdc) for Pew Digital Data Mart (`ddm-dbt`).
+
+## Looker / Civis / GA4
+
+- `dashboard-support.mdc`, `content_dashboard_exposure.yml`, `top_ga4_dashboards.yml`
+- `ga4-metrics.mdc`, `docs/metrics/ga4-content-metrics.md`, `docs/CHANNEL_QUARTERLY_KPI_METRICS.md`
+- Dashboard docs under `docs/dashboards/`

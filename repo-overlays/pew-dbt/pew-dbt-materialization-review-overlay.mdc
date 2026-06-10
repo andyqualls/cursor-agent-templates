@@ -1,0 +1,18 @@
+---
+description: Pew dbt materialization supplements — Redshift, Civis, and reporting tables (repo overlay bootstrap)
+alwaysApply: false
+---
+
+# Pew dbt materialization review overlay
+
+Extends [agent-materialization-review](agent-materialization-review.mdc) for Pew Digital Data Mart (`ddm-dbt`).
+
+## Redshift / Civis / dashboards
+
+- Sort/dist keys, Redshift CTE behavior — `redshift-civis.mdc`
+- Civis runtime and large marts (`mart_content_*`, TOP facts)
+- Dashboard-facing tables — `agent-dashboard-impact.mdc`, `dashboard-support.mdc`
+
+## Runbooks
+
+- `docs/dbt_assessment_audit.md`, `docs/ARCHITECTURE.md`, `docs/runbooks/schema-change-review.md`
