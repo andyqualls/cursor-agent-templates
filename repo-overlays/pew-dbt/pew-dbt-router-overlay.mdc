@@ -1,0 +1,50 @@
+---
+description: Pew DDM dbt task routing — specialist agent mapping (repo overlay bootstrap)
+alwaysApply: true
+---
+
+# Pew dbt router overlay
+
+Extends [agent-router-base](agent-router-base.mdc). Invoke specialists **explicitly** in the prompt when possible; this table is the fallback.
+
+## Task → agent mapping
+
+| Task | Primary agent | Also invoke when applicable |
+|------|---------------|----------------------------|
+| Edit SQL models | [agent-model-change](agent-model-change.mdc) | [agent-incremental-safety](agent-incremental-safety.mdc) if incremental; [agent-dashboard-impact](agent-dashboard-impact.mdc) if marts/reporting |
+| Review PR or diff | [agent-pr-reviewer](agent-pr-reviewer.mdc) | [agent-dashboard-impact](agent-dashboard-impact.mdc), [safe-change-review](safe-change-review.mdc) |
+| Incremental logic / config | [agent-incremental-safety](agent-incremental-safety.mdc) | [agent-model-change](agent-model-change.mdc) |
+| Marts, exposures, TOP, quarterly KPIs | [agent-dashboard-impact](agent-dashboard-impact.mdc) | [safe-change-review](safe-change-review.mdc) |
+| Identity, segments, SFMC/GA4 joins | [agent-segmentation-identity](agent-segmentation-identity.mdc) | [agent-dashboard-impact](agent-dashboard-impact.mdc) if DDM dashboards |
+| Materialization or model deletion | [agent-materialization-review](agent-materialization-review.mdc) | [agent-dashboard-impact](agent-dashboard-impact.mdc) |
+| Docs only | [agent-documentation](agent-documentation.mdc) | — |
+| Validate a claim before changing code | [agent-audit](agent-audit.mdc) | relevant specialist for the domain |
+| YAML tests / schema YAML | [agent-test-yaml](agent-test-yaml.mdc) | [safe-change-review](safe-change-review.mdc) if grain changes |
+| Source freshness | [agent-source-freshness](agent-source-freshness.mdc) | — |
+
+## Shared rules (`alwaysApply: true`)
+
+- [analytics-context](analytics-context.mdc) — repo stack and orientation
+- [agent-router-base](agent-router-base.mdc) — global routing principles
+- [safe-change-review](safe-change-review.mdc) — consumer checks, plan-before-edit gate
+- [pew-dbt-high-risk](pew-dbt-high-risk.mdc) — Pew high-risk areas and runbooks
+- [dbt-validation-commands](dbt-validation-commands.mdc) — canonical `dbt` commands
+- [agent-output-contract](agent-output-contract.mdc) — response shape and no-fake-inspection rules
+
+## Example prompts
+
+**Model change:**
+```text
+Use agent-model-change and agent-incremental-safety.
+Investigate [issue] in mart_content_daily.
+Map upstream/downstream, state grain, classify the change.
+Do not edit until you propose the smallest safe PR.
+```
+
+**PR review:**
+```text
+Use agent-pr-reviewer, agent-dashboard-impact, and safe-change-review.
+Review the current diff as a skeptical dbt maintainer.
+Focus on metric risk, dashboard breakage, incremental safety, validation gaps.
+Return a merge verdict.
+```

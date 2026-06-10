@@ -1,0 +1,40 @@
+---
+description: Safe change review before schema or metric edits
+alwaysApply: true
+---
+
+# Safe change review
+
+Docs and rules guide workflows; project code, tests, config, exposures, and active orchestration config are authoritative.
+
+Specialist routing: repo router overlay. Validation commands: repo validation overlay. Response shape: [agent-output-contract](agent-output-contract.mdc).
+
+## Plan before edit
+
+Unless the user explicitly asked to implement immediately:
+
+1. **Inspect** relevant code, config, YAML, and dependency lineage.
+2. **State** affected files, data grain or API contract, and change classification (cleanup / schema-affecting / metric-changing).
+3. **Propose** the smallest safe diff — **wait for approval before editing files**.
+
+## Consumer checklist
+
+Before renaming columns, changing grains, or altering incremental or aggregation logic:
+
+1. **Downstream dependencies** — in-repo lineage (`ref()`, imports, generated clients)
+2. **Tests** — unit, integration, schema, singular invariants
+3. **Orchestration jobs** — external schedulers; confirm selectors, tags, and job names with team
+4. **BI / reporting** — dashboards, exposures, field mappings (renames break silently)
+5. **Direct consumers** — notebooks, QA, ad hoc queries; zero in-repo refs ≠ unused
+6. **Docs** — metric definitions and change runbooks
+
+**Repo high-risk areas:** see repo overlay (e.g. `pew-dbt-high-risk.mdc`).
+
+## Process
+
+- Run validation commands from the repo validation overlay
+- For metric or logic changes, compare before/after row counts and core totals where feasible
+- Broad changes: plan first, small PRs; minimum review output per project runbook
+- After incremental logic changes: consider full rebuild/backfill and document in PR
+
+**Documentation-only tasks:** do not modify production code, models, or seeds unless explicitly requested.

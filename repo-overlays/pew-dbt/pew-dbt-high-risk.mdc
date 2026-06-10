@@ -1,0 +1,31 @@
+---
+description: Pew DDM dbt high-risk change areas (repo-owned overlay)
+alwaysApply: true
+---
+
+# Pew dbt high-risk areas
+
+Extends [safe-change-review](safe-change-review.mdc). Applies to Pew Digital Data Mart (`ddm-dbt`).
+
+## High-risk areas
+
+- `sitecore_item_id` filters and grain
+- `unique_key` on `fct_content_*` / `mart_content_*`
+- `user_pseudo_id` casts in GA4 raw
+- Traffic source normalization (`fct_content_sources_daily`)
+- Facebook metric bridge (quarterly KPI doc)
+- GA4 seed backfills — scope is date/incident specific
+
+## Pew consumer specifics
+
+When checking the [consumer checklist](safe-change-review.mdc#consumer-checklist):
+
+3. **Civis jobs** — `pewdigital/civis-dbt` image; confirm selectors, tags, model names
+4. **Looker Studio** — exposure YAML and dashboard fields
+6. **Docs** — [`docs/metrics/`](../../docs/metrics/), [`docs/CHANNEL_QUARTERLY_KPI_METRICS.md`](../../docs/CHANNEL_QUARTERLY_KPI_METRICS.md) for channel metrics
+
+## Runbooks and validation
+
+Runbook: [`docs/runbooks/schema-change-review.md`](../../docs/runbooks/schema-change-review.md)  
+Template: [`templates/schema-change-review.md`](../../templates/schema-change-review.md)  
+Commands: [dbt-validation-commands](dbt-validation-commands.mdc)

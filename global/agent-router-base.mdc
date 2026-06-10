@@ -1,0 +1,14 @@
+---
+description: Thin global agent routing principles (domain routing lives in repo overlay)
+alwaysApply: true
+---
+
+# Agent router (base)
+
+Use the most specific applicable specialist rule for the task. Combine specialists when a task spans multiple risk areas (e.g. model change + incremental safety + reporting impact).
+
+Unless the user explicitly asked to implement immediately, follow **plan before edit** in [safe-change-review](safe-change-review.mdc#plan-before-edit).
+
+For review-style answers, use [agent-output-contract](agent-output-contract.mdc).
+
+**Domain and repo routing:** see the repo router overlay (e.g. `pew-dbt-router-overlay.mdc` in dbt repos).
