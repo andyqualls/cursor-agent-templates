@@ -1,0 +1,71 @@
+---
+description: Canonical dbt validation commands — reference from all agents
+alwaysApply: true
+---
+
+# dbt validation commands
+
+Single source of truth for validation commands. Specialist agents reference this file instead of duplicating command blocks.
+
+## Baseline (every change)
+
+```bash
+dbt parse
+dbt compile --select <model>+
+```
+
+## Standard model change
+
+```bash
+dbt build --select <model>+
+```
+
+Equivalent split when debugging:
+
+```bash
+dbt run --select <model>+
+dbt test --select <model>+
+```
+
+## Incremental models
+
+After config or logic changes:
+
+```bash
+dbt run --select <model>          # normal incremental first
+dbt run --select <model> --full-refresh   # required when columns added/removed or logic needs backfill
+dbt test --select <model>+
+```
+
+State `--full-refresh` requirement in the PR when schema or incremental logic changes.
+
+## PR / multi-model validation
+
+When reviewing a branch diff (requires prior `dbt compile` or `dbt run` to populate manifest):
+
+```bash
+dbt parse
+dbt build --select state:modified+
+```
+
+When state selection is unavailable, name changed models explicitly:
+
+```bash
+dbt parse
+dbt build --select <changed_models>+
+```
+
+## Source freshness
+
+```bash
+dbt source freshness --select source:<name>
+```
+
+## Metric or schema work (add to build)
+
+- Before/after row counts on affected models
+- Core metric totals comparison
+- Looker Studio field check (exposure YAML)
+- Civis job selectors if model names or tags changed
+
+Runbook: see repo overlay for project runbook path (e.g. `docs/runbooks/schema-change-review.md`).

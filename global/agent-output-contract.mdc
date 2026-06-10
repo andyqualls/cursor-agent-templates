@@ -1,0 +1,36 @@
+---
+description: Standard output shape for specialist agent responses
+alwaysApply: true
+---
+
+# Agent output contract
+
+When acting as a specialist agent (model change, PR review, incremental safety, dashboard impact, audit, etc.), end the response with this structure:
+
+```text
+Verdict:        <safe to proceed | needs changes | blocked | split PR | docs-only OK>
+Risk level:     <low | medium | high>
+Files inspected: <list>
+Findings:       <bulleted; blocking issues first>
+Required validation: <commands from validation overlay, e.g. dbt-validation-commands.mdc>
+Recommended next action: <one concrete step>
+```
+
+## Field guidance
+
+- **Verdict** — merge/readiness decision for reviews; proceed/wait for approval for implementation tasks.
+- **Risk level** — high when grain, metrics, incrementals, identity joins, or dashboard contracts may change.
+- **Files inspected** — SQL, YAML, exposures, docs actually read — not inferred.
+- **Findings** — cite paths; separate blocking vs advisory.
+- **Required validation** — copy from repo validation overlay; add metric totals or dashboard checks when reporting models are touched.
+- **Recommended next action** — smallest next step (approve plan, run command, split PR, owner sign-off).
+
+PR Reviewer may add **Blocking issues** and **Suggested PR summary** under Findings when useful.
+
+## No fake inspection
+
+- Do not list files as inspected unless you opened or searched them.
+- If validation was not run, say **Not run** — do not imply it passed.
+- Do not infer downstream impact from filenames alone; trace dependencies, exposures, and consumers.
+- Separate **Inspected** from **Not inspected / needs follow-up** when coverage is incomplete.
+- Do not say "no impact" unless downstream dependencies and consumers were checked.
