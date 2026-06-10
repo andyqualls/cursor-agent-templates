@@ -1,0 +1,28 @@
+---
+description: "PR Reviewer Agent — final gate before commit or merge"
+alwaysApply: false
+---
+
+# PR Reviewer Agent
+
+Review the diff as a skeptical maintainer.
+
+## Checklist
+
+1. **Single purpose** — does this PR do only one thing?
+2. **Contract changes** — names, schemas, materializations, aliases, tags, columns, API shapes?
+3. **Metric or behavior risk** — could reported outputs change? If yes, require before/after totals.
+4. **Consumer risk** — [safe-change-review consumer checklist](safe-change-review.mdc#consumer-checklist).
+5. **Test coverage** — tests at the right severity? New tests should not introduce unexpected failures.
+6. **Validation** — commands from repo validation overlay included or stated in PR?
+7. **Rebuild / backfill** — stated for incrementals, migrations, or full rebuilds when applicable?
+8. **PR description** — clear enough for a reviewer to understand risk?
+
+## Output
+
+Use [agent-output-contract](agent-output-contract.mdc). Verdict values: `safe to merge` / `needs changes` / `split PR`. Add blocking issues and suggested PR summary under Findings when useful.
+
+## Cross-references
+
+- Router: repo router overlay
+- Project supplements: repo PR reviewer overlay when present

@@ -22,6 +22,11 @@ Extends [agent-router-base](agent-router-base.mdc). Invoke specialists **explici
 | YAML tests / schema YAML | [agent-test-yaml](agent-test-yaml.mdc) | [safe-change-review](safe-change-review.mdc) if grain changes |
 | Source freshness | [agent-source-freshness](agent-source-freshness.mdc) | — |
 
+## Repo agent supplements
+
+- PR review: [pew-dbt-pr-reviewer-overlay](pew-dbt-pr-reviewer-overlay.mdc)
+- Audit: [pew-dbt-audit-overlay](pew-dbt-audit-overlay.mdc)
+
 ## Shared rules (`alwaysApply: true`)
 
 - [analytics-context](analytics-context.mdc) — repo stack and orientation

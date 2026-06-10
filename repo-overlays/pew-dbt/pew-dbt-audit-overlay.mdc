@@ -1,0 +1,22 @@
+---
+description: Pew dbt audit supplements — assessment queue and runbooks (repo overlay bootstrap)
+alwaysApply: false
+---
+
+# Pew dbt audit overlay
+
+Extends [agent-audit](agent-audit.mdc) for Pew Digital Data Mart (`ddm-dbt`).
+
+## Inspect as source of truth
+
+SQL, YAML, `dbt_project.yml`, exposures, and active Civis configuration.
+
+## Pew references
+
+- Schema change review: `docs/runbooks/schema-change-review.md`
+- Audit queue: `docs/dbt_assessment_audit.md`
+- High-risk areas: `pew-dbt-high-risk.mdc`
+
+## External consumers
+
+Zero `ref()` alone is not proof of unused — check Redshift direct queries, Civis jobs, Looker Studio, notebooks.

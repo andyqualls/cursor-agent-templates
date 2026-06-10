@@ -1,0 +1,20 @@
+---
+description: Pew dbt PR review supplements — runbooks and checklists (repo overlay bootstrap)
+alwaysApply: false
+---
+
+# Pew dbt PR reviewer overlay
+
+Extends [agent-pr-reviewer](agent-pr-reviewer.mdc) for Pew Digital Data Mart (`ddm-dbt`).
+
+Review as a skeptical **dbt maintainer** on Redshift/Civis/Looker Studio.
+
+## Pew runbooks
+
+- Dev checklist: `docs/runbooks/dbt-development-checklist.md`
+- Schema change review: `docs/runbooks/schema-change-review.md`
+- High-risk areas: `pew-dbt-high-risk.mdc`
+
+## Validation
+
+Use `dbt-validation-commands.mdc`. For metric/schema work add row counts, metric totals, Looker fields, Civis selectors.

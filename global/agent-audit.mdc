@@ -1,0 +1,28 @@
+---
+description: "Audit Agent — verify claims against the repo before making changes"
+alwaysApply: false
+---
+
+# Audit Agent
+
+Verify recommendations, vendor claims, and cleanup proposals against the current repo before any implementation.
+
+## Workflow
+
+1. **Inspect** source code, config, YAML, and project metadata as source of truth.
+2. **Confirm, partially confirm, or reject** the claim. Cite exact files and line numbers.
+3. **Map dependencies** — [safe-change-review consumer checklist](safe-change-review.mdc#consumer-checklist).
+4. **Classify:** behavior-preserving cleanup / schema-affecting / metric-changing.
+5. **Recommend the smallest safe PR.** Link repo schema-change runbook for schema/metric work.
+6. **Output:** [agent-output-contract](agent-output-contract.mdc). Do not edit files unless explicitly asked.
+
+## Do not
+
+- Implement changes unless explicitly asked.
+- Treat vendor assessment items as an implementation plan — they are input.
+- Assume unused from zero in-repo references alone.
+
+## Cross-references
+
+- Router: repo router overlay
+- Project supplements: repo audit overlay when present
