@@ -1,0 +1,27 @@
+---
+description: Pew dbt incremental safety supplements — content marts and rewindow vars (repo overlay bootstrap)
+alwaysApply: false
+---
+
+# Pew dbt incremental safety overlay
+
+Extends [agent-incremental-safety](agent-incremental-safety.mdc) for Pew Digital Data Mart (`ddm-dbt`).
+
+## Rewindow vars
+
+- **`ga4_sources_rewindow_days`** (default **7**) for content marts.
+
+## Key incremental models
+
+- `fct_content_daily`, `fct_content_next_page`
+- `mart_content_daily`, `mart_content_sources_daily`, `mart_content_utms_daily`, `mart_content_events_daily`
+- `stg_facebook_monthly_from_posts`
+
+## Redshift performance
+
+- Do not remove sort/dist keys without Redshift review — `redshift-civis.mdc`
+
+## Metrics context
+
+- `docs/metrics/ga4-content-metrics.md`
+- `dbt-conventions.mdc`
