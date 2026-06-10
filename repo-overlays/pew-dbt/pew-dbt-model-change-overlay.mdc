@@ -1,0 +1,37 @@
+---
+description: Pew dbt model change supplements — GA4 grain, metrics, and consumers (repo overlay bootstrap)
+globs:
+  - "models/**/*.sql"
+alwaysApply: false
+---
+
+# Pew dbt model change overlay
+
+Extends [agent-model-change](agent-model-change.mdc) for Pew Digital Data Mart (`ddm-dbt`).
+
+## Grain and naming
+
+- Page-level content grain: **`sitecore_item_id` + `date`** — exclude null / `(not set)` Sitecore IDs in content facts.
+- Cast **`user_pseudo_id` to `varchar`** in GA4 raw staging; keep staging ↔ mart types aligned.
+- Conventions: `dbt-conventions.mdc`
+
+## High-risk areas
+
+See `pew-dbt-high-risk.mdc`: `unique_key` on `fct_content_*` / `mart_content_*`, traffic source normalization, GA4 seed backfills (incident-specific scope only).
+
+## Metrics and reporting
+
+- GA4 content metrics: `ga4-metrics.mdc`
+- For marts / reporting: row counts, metric totals, Looker exposures, `dashboard-support.mdc`
+- Key content facts/marts: `fct_content_daily`, `mart_content_daily`, `mart_content_sources_daily`, and related content marts.
+
+## Do not (Pew-specific)
+
+- Generalize GA4 seed backfill fixes beyond their specific date/incident scope.
+- Change `sitecore_item_id` filters or grain without mapping downstream content dashboards.
+
+## Runbooks
+
+- `docs/runbooks/schema-change-review.md`
+- `docs/runbooks/dbt-development-checklist.md`
+- `redshift-civis.mdc`

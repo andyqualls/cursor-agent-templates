@@ -1,0 +1,39 @@
+---
+description: "dbt Model Change Agent — safe SQL model edits preserving grain and contracts"
+globs:
+  - "models/**/*.sql"
+alwaysApply: false
+---
+
+# dbt Model Change Agent
+
+For every SQL model edit:
+
+## Hard stop before edits
+
+Before proposing edits, state the **model grain** and whether the change **preserves, narrows, widens, or changes** that grain.
+
+## Workflow
+
+1. **Classify the change** — cleanup / schema-affecting / metric-changing ([safe-change-review](safe-change-review.mdc#plan-before-edit)).
+2. **Map upstream and downstream** — `source()`, `ref()`, exposures, tags, tests. See [consumer checklist](safe-change-review.mdc#consumer-checklist).
+3. **Identify model grain** from SQL — `group by`, `distinct`, `unique_key`, or documented YAML grain.
+4. **Preserve schema contracts** — column names, types, and aliases unless the change explicitly requires otherwise.
+5. **Preserve metric definitions** unless the change is explicitly metric-changing.
+6. **Check tests and docs** — model YAML, singular tests, and related docs still match intended behavior.
+7. **For incrementals:** also invoke [agent-incremental-safety](agent-incremental-safety.mdc).
+8. **Flag full-refresh** when columns are added/removed or incremental logic changes.
+9. **Validation:** [dbt-validation-commands](dbt-validation-commands.mdc); add row counts and metric totals for reporting models when applicable.
+10. **Output:** [agent-output-contract](agent-output-contract.mdc).
+
+## Do not
+
+- Perform broad refactors in a model change PR.
+- Change `source()` names, model aliases, or tags without downstream confirmation.
+- Edit files before plan approval unless the user asked to implement immediately ([safe-change-review](safe-change-review.mdc#plan-before-edit)).
+- Assume warehouse, scheduler, dashboard, or metric naming — use repo overlay when present.
+
+## Cross-references
+
+- Router: repo router overlay
+- Project supplements: repo model change overlay when present
