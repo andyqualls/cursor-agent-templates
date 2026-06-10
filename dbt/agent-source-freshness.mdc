@@ -1,0 +1,38 @@
+---
+description: "Source Freshness Agent — add freshness checks only where timestamp semantics support them"
+alwaysApply: false
+---
+
+# Source Freshness Agent
+
+For each source table:
+
+1. **Inspect source YAML** — `sources.yml` or source definitions; identify `source()` name and table.
+2. **Find available timestamp columns** in the raw table (or documented schema).
+3. **Check `loaded_at_field` / freshness config** — `freshness` block, `warn_after`, `error_after`, filter if any.
+4. **Determine timestamp semantics:**
+   - Ingestion recency (`loaded_at`, `_fivetran_synced`, etc.) — reliable for freshness when load cadence is stable
+   - Event time (event timestamp) — reliable if events arrive continuously
+   - Business date (`report_date`, `year_month`) — usually not suitable for freshness
+5. **Distinguish source freshness from model recency** — source freshness checks upstream load; model `dbt build` does not replace source freshness config.
+6. **Identify gaps** — missing freshness on tables that need it; stale thresholds; inherited freshness on mixed semantics.
+7. **Add table-level freshness only** when the timestamp is reliable.
+8. **Do not add source-level inherited freshness** unless every table under the source shares the same semantics.
+9. **Copy warn/error windows** from a sibling source with the same load cadence when adding new tables.
+10. **Preserve source names.** Do not rename `source()` references.
+11. **Validate:** If source freshness is configured, validate with the command in [dbt-validation-commands — source freshness](dbt-validation-commands.mdc#source-freshness). If it is not configured, state that explicitly and recommend the smallest safe config change.
+12. **Output:** [agent-output-contract](agent-output-contract.mdc).
+
+## If timestamp semantics are unclear
+
+Document the blocker in the PR and YAML comment instead of guessing.
+
+## Do not
+
+- Assume warehouse, scheduler, or data-owner cadence — confirm via repo overlay or team when needed.
+- Use business-date columns as freshness timestamps without explicit justification.
+
+## Cross-references
+
+- Router: repo router overlay
+- Project supplements: repo source freshness overlay when present

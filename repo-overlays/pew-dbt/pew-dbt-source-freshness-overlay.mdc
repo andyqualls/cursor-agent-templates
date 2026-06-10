@@ -1,0 +1,28 @@
+---
+description: Pew dbt source freshness supplements — Civis cadence and configured sources (repo overlay bootstrap)
+alwaysApply: false
+---
+
+# Pew dbt source freshness overlay
+
+Extends [agent-source-freshness](agent-source-freshness.mdc) for Pew Digital Data Mart (`ddm-dbt`).
+
+## Orchestration and warehouse
+
+- Loads run via **Civis** (`pewdigital/civis-dbt` image) into **Redshift** — copy `warn_after` / `error_after` from a sibling source with the same Civis cadence.
+- Confirm in Civis before `error_after` fires in prod on new checks.
+- Redshift/Civis context: `redshift-civis.mdc`
+
+## Existing freshness in this repo
+
+- Sitecore: 2 tables (`models/communications/sitecore/staging/sitecore.yml`)
+- SFMC: 3 tables (`models/communications/sfmc/base/sfmc.yml`)
+- DDM segments: `user_segments` only (`models/communications/ddm_segment_scripts/staging/ddm_segment_scripts.yml`)
+
+GA4 and other imports: confirm load cadence and timestamp column before adding freshness.
+
+## Runbooks and audit
+
+- Adding sources: `docs/runbooks/adding-a-new-source.md`
+- Freshness guidance: `docs/dbt_assessment_audit.md` (freshness section)
+- Example blocker: `segment_metadata` has no suitable timestamp — document skip in PR/YAML instead of guessing.
