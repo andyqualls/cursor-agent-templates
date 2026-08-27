@@ -1,11 +1,11 @@
 ---
-description: "PR Reviewer Agent — final gate before commit or merge"
+description: "PR review — final gate before commit or merge"
 alwaysApply: false
 ---
 
-# PR Reviewer Agent
+# PR review
 
-Review the diff as a skeptical maintainer.
+Review the diff as a skeptical maintainer. This file is a **review rule** for the current session unless the repo overlay launches a PR subagent.
 
 ## Checklist
 
@@ -14,13 +14,17 @@ Review the diff as a skeptical maintainer.
 3. **Metric or behavior risk** — could reported outputs change? If yes, require before/after totals.
 4. **Consumer risk** — [safe-change-review consumer checklist](safe-change-review.mdc#consumer-checklist).
 5. **Test coverage** — tests at the right severity? New tests should not introduce unexpected failures.
-6. **Validation** — commands from repo validation overlay included or stated in PR?
-7. **Rebuild / backfill** — stated for incrementals, migrations, or full rebuilds when applicable?
+6. **After review of the diff (required):** execute the verifier — do not substitute a prose review:
+   ```bash
+   .cursor/skills/verify-ddm-dbt/scripts/verify.sh changed
+   ```
+   Record PASS/FAIL/NOT RUN from `target/verify-ddm-dbt/report.md`. If the script is absent, run **Local automated checks** in [dbt-validation-commands](dbt-validation-commands.mdc).
+7. **Rebuild / backfill** — stated using the incremental decision table when applicable?
 8. **PR description** — clear enough for a reviewer to understand risk?
 
 ## Output
 
-Use [agent-output-contract](agent-output-contract.mdc). Verdict values: `safe to merge` / `needs changes` / `split PR`. Add blocking issues and suggested PR summary under Findings when useful.
+Use [agent-output-contract](agent-output-contract.mdc). Typical verdicts: `ready to merge` / `safe for Civis testing` / `warehouse validation failed` / `blocked` / `split change`. Add blocking issues and suggested PR summary under Findings when useful.
 
 ## Cross-references
 

@@ -1,14 +1,18 @@
 ---
-description: Thin global agent routing principles (domain routing lives in repo overlay)
+description: Thin global routing — review rules vs real subagents (domain table in repo overlay)
 alwaysApply: true
 ---
 
-# Agent router (base)
+# Review router (base)
 
-Use the most specific applicable specialist rule for the task. Combine specialists when a task spans multiple risk areas (e.g. model change + incremental safety + reporting impact).
+Use the most specific applicable **review rule** for the task. Apply additional review rules in the same context when a task spans risk areas (e.g. model change + incremental safety + reporting impact).
 
-Unless the user explicitly asked to implement immediately, follow **plan before edit** in [safe-change-review](safe-change-review.mdc#plan-before-edit).
+Pause vs implement: [safe-change-review](safe-change-review.mdc#plan-before-edit) only — do not duplicate that gate here.
 
-For review-style answers, use [agent-output-contract](agent-output-contract.mdc).
+Review-style answers: [agent-output-contract](agent-output-contract.mdc).
+
+**Rules vs subagents:** files under `.cursor/rules` instruct the current session. They are not independent reviewers. Reserve “agent” / subagent for `.cursor/agents` (and skills those agents load). Launch a subagent only when the repo overlay says so (high-risk incremental, shared macros, identity, multi-mart reporting, unclear data defects, final PR review if a subagent exists).
+
+When the repo overlay requires a verification skill, run it before claiming a dbt change is complete.
 
 **Domain and repo routing:** see the repo router overlay (e.g. `pew-dbt-router-overlay.mdc` in dbt repos).

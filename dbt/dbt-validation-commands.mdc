@@ -1,71 +1,132 @@
 ---
-description: Canonical dbt validation commands — reference from all agents
-alwaysApply: true
+description: >
+  Canonical dbt validation commands split into local (no warehouse),
+  Redshift/Civis execution, and result SQL. Use when changing models, macros,
+  tests, sources, YAML, or reviewing a dbt PR. Not needed for docs-only work.
+globs:
+  - "models/**/*.sql"
+  - "models/**/*.yml"
+  - "models/**/*.yaml"
+  - "macros/**/*.sql"
+  - "macros/**/*.yml"
+  - "macros/**/*.yaml"
+  - "snapshots/**/*.sql"
+  - "snapshots/**/*.yml"
+  - "snapshots/**/*.yaml"
+  - "seeds/**/*.yml"
+  - "seeds/**/*.yaml"
+  - "tests/**"
+  - "dbt_project.yml"
+  - "packages.yml"
+  - "package-lock.yml"
+  - "selectors.yml"
+  - "Makefile"
+alwaysApply: false
 ---
 
 # dbt validation commands
 
-Single source of truth for validation commands. Specialist agents reference this file instead of duplicating command blocks.
+Reference for review rules and `verify-ddm-dbt`. Do not duplicate these blocks in other rules. Record what actually ran in [agent-output-contract](agent-output-contract.mdc) (`PASS` / `FAIL` / `NOT RUN` / `NOT AVAILABLE`).
 
-## Baseline (every change)
+`dbt parse` does not connect to the warehouse. `dbt compile`, `build`, `run`, `test`, and `source freshness` do.
+
+## Local automated checks
+
+No warehouse. Proof of project definition only.
 
 ```bash
-dbt parse
-dbt compile --select <model>+
+dbt deps
+dbt parse --no-partial-parse
 ```
 
-## Standard model change
+When this repo has the verifier skill, run that instead of ad-hoc parse (it wraps deps/parse plus manifest and static Redshift checks):
 
 ```bash
+.cursor/skills/verify-ddm-dbt/scripts/verify.sh changed
+```
+
+Do not treat skipped `compile`/`build` as a failed local environment.
+
+## Redshift / Civis checks
+
+Unavailable locally unless a warehouse connection exists (VDI + profile). Do not list these as passed unless they ran against Redshift.
+
+```bash
+dbt compile --select <model>
 dbt build --select <model>+
 ```
 
-Equivalent split when debugging:
+Debug split:
 
 ```bash
 dbt run --select <model>+
 dbt test --select <model>+
 ```
 
+`compile` can still hit the adapter for relation caching and introspective macros. It is not a warehouse-free syntax proof.
+
 ## Incremental models
 
-After config or logic changes:
+Do not assume every column or logic change requires `--full-refresh`. Decide from config and whether history must change:
+
+| Change | Expected action |
+|--------|-----------------|
+| New column, future rows only, compatible `on_schema_change` | Incremental run may be enough |
+| New column requiring historical values | Full refresh or targeted backfill |
+| Removed or renamed column | Check `on_schema_change`, consumers, and deployment behavior |
+| Metric logic affecting historical rows | Full refresh or bounded backfill |
+| Incremental predicate change | Test existing-table path, full-build path, and late-arriving data |
+| `unique_key` change | High-risk review and duplicate/reconciliation tests |
 
 ```bash
-dbt run --select <model>          # normal incremental first
-dbt run --select <model> --full-refresh   # required when columns added/removed or logic needs backfill
+dbt run --select <model>
+dbt run --select <model> --full-refresh   # only when the table above says so
+dbt run --select <model>                  # second incremental run — the path Civis uses daily
 dbt test --select <model>+
 ```
 
-State `--full-refresh` requirement in the PR when schema or incremental logic changes.
+State the refresh/backfill choice in the PR. After a full refresh, the second incremental run is required.
 
 ## PR / multi-model validation
 
-When reviewing a branch diff (requires prior `dbt compile` or `dbt run` to populate manifest):
+Use state selection only when a baseline manifest from the comparison
+environment is available:
 
 ```bash
-dbt parse
-dbt build --select state:modified+
+dbt build \
+  --select state:modified+ \
+  --state <baseline-artifact-directory>
 ```
 
-When state selection is unavailable, name changed models explicitly:
+Do not use the current branch's `target/manifest.json` as its own baseline.
+
+Baseline sources (repo overlay may name the real one): last successful production run artifacts, main-branch Civis artifacts, or a manifest saved before the branch started.
+
+If no baseline manifest is available:
 
 ```bash
-dbt parse
 dbt build --select <changed_models>+
 ```
 
 ## Source freshness
 
+Warehouse required.
+
 ```bash
 dbt source freshness --select source:<name>
 ```
 
-## Metric or schema work (add to build)
+## Result validation
 
-- Before/after row counts on affected models
-- Core metric totals comparison
-- Looker Studio field check (exposure YAML)
-- Civis job selectors if model names or tags changed
+Not generic shell commands. Generate from model grain and business logic; put exact SQL in the output contract:
 
-Runbook: see repo overlay for project runbook path (e.g. `docs/runbooks/schema-change-review.md`).
+- Grain uniqueness query
+- Null-key query
+- Before/after row count
+- Metric reconciliation
+- Duplicate incremental-key query
+- Second incremental-run comparison
+- Dashboard field and exposure check
+- Orchestration selectors if model names or tags changed (confirm in Civis; do not invent job names)
+
+Runbook: see repo overlay (e.g. `docs/runbooks/schema-change-review.md`).

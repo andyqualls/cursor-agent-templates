@@ -25,4 +25,6 @@ Set `CURSOR_TEMPLATES_REPO` if the template repo is not at `../cursor-agent-temp
 
 ## Versioning
 
-Bump `template_version` in each project's `.cursor/cursor-manifest.yaml` when rolling out template changes.
+Bump `template_version` in each project's `.cursor/cursor-manifest.yaml` when rolling out template changes, then tag `cursor-agent-templates` (`v<version>`) so CI pins the same revision.
+
+Rules under `.cursor/rules` are review policy for the active session. Executable verification lives in repo skills (e.g. `verify-ddm-dbt`). The only Pew custom subagent today is `deep-bug-finder`.

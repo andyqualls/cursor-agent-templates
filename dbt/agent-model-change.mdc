@@ -1,11 +1,11 @@
 ---
-description: "dbt Model Change Agent — safe SQL model edits preserving grain and contracts"
+description: "dbt model-change review — safe SQL edits preserving grain and contracts"
 globs:
   - "models/**/*.sql"
 alwaysApply: false
 ---
 
-# dbt Model Change Agent
+# dbt model-change review
 
 For every SQL model edit:
 
@@ -21,17 +21,23 @@ Before proposing edits, state the **model grain** and whether the change **prese
 4. **Preserve schema contracts** — column names, types, and aliases unless the change explicitly requires otherwise.
 5. **Preserve metric definitions** unless the change is explicitly metric-changing.
 6. **Check tests and docs** — model YAML, singular tests, and related docs still match intended behavior.
-7. **For incrementals:** also invoke [agent-incremental-safety](agent-incremental-safety.mdc).
-8. **Flag full-refresh** when columns are added/removed or incremental logic changes.
-9. **Validation:** [dbt-validation-commands](dbt-validation-commands.mdc); add row counts and metric totals for reporting models when applicable.
-10. **Output:** [agent-output-contract](agent-output-contract.mdc).
+7. **For incrementals:** apply [agent-incremental-safety](agent-incremental-safety.mdc) in this same review (not a separate subagent unless the overlay says so).
+8. **Full refresh:** use the incremental decision table in [dbt-validation-commands](dbt-validation-commands.mdc#incremental-models) — not every column/logic change needs `--full-refresh`.
+9. **After edits (required):** execute the verifier — do not substitute a prose review:
+   ```bash
+   .cursor/skills/verify-ddm-dbt/scripts/verify.sh changed
+   ```
+   If that script is absent, run `dbt deps` and `dbt parse --no-partial-parse`. Warehouse `compile`/`build` only with a connection. Add row counts and metric totals for reporting models when Redshift is available.
+10. **Output:** [agent-output-contract](agent-output-contract.mdc). Fill **Checks run** from `target/verify-ddm-dbt/report.md` when the script ran.
 
 ## Do not
 
 - Perform broad refactors in a model change PR.
 - Change `source()` names, model aliases, or tags without downstream confirmation.
-- Edit files before plan approval unless the user asked to implement immediately ([safe-change-review](safe-change-review.mdc#plan-before-edit)).
+- Pause for approval on ordinary “fix this model” work ([safe-change-review](safe-change-review.mdc#plan-before-edit)).
 - Assume warehouse, scheduler, dashboard, or metric naming — use repo overlay when present.
+- Convert this review into a skill; keep it as a path-scoped rule.
+- Skip `verify.sh` after SQL edits when that script exists in the repo.
 
 ## Cross-references
 

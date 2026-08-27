@@ -1,23 +1,28 @@
 ---
-description: "Incremental Model Safety Agent — prevent partial rebuild issues and bad incremental logic"
+description: "Incremental model safety review — prevent partial rebuild issues and bad incremental logic"
 alwaysApply: false
 ---
 
-# Incremental Model Safety Agent
+# Incremental model safety review
 
 For any incremental model edit:
 
 1. **Identify current config:** `unique_key`, `sort`, `dist`, `incremental_strategy`, `on_schema_change`, `is_incremental()` filter logic.
 2. **Check project rewindow vars** — date-window vars that control how much history incremental runs reprocess; confirm in repo overlay or `dbt_project.yml`.
-3. **New columns → full refresh.** State `--full-refresh` in PR when columns added/removed.
-4. **Logic changes → wider date window.** Check whether reprocessing beyond the default rewindow is needed.
-5. **Validate:** [dbt-validation-commands — incremental](dbt-validation-commands.mdc#incremental-models).
-6. **Flag risks:** duplicate rows, stale rows, missing historical backfill.
-7. **Output:** [agent-output-contract](agent-output-contract.mdc).
+3. **Refresh vs incremental:** use the decision table in [dbt-validation-commands](dbt-validation-commands.mdc#incremental-models). Do not require full refresh for every new column.
+4. **Logic changes → history:** if output should change for old rows, plan full refresh or bounded backfill (rewindow vars in overlay).
+5. **After a full refresh:** run the model incrementally again (Civis daily path).
+6. **After edits (required):** execute the verifier — do not substitute a prose review:
+   ```bash
+   .cursor/skills/verify-ddm-dbt/scripts/verify.sh changed
+   ```
+   If that script is absent, run the **Local automated checks** in [dbt-validation-commands](dbt-validation-commands.mdc). Warehouse commands only with a connection.
+7. **Flag risks:** duplicate rows, stale rows, missing historical backfill.
+8. **Output:** [agent-output-contract](agent-output-contract.mdc). Fill **Checks run** from `target/verify-ddm-dbt/report.md` when the script ran.
 
 ## Do not
 
-- Assume a normal `dbt run` is enough after logic changes on incrementals.
+- Assume a normal `dbt run` is enough after logic changes that rewrite history.
 - Change `unique_key` without checking downstream dedup assumptions.
 - Remove sort/dist keys without warehouse query performance review (see repo overlay).
 

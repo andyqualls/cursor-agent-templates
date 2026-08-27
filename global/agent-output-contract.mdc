@@ -1,36 +1,76 @@
 ---
-description: Standard output shape for specialist agent responses
+description: Standard output shape for specialist review responses — proof of what ran
 alwaysApply: true
 ---
 
-# Agent output contract
+# Review output contract
 
-When acting as a specialist agent (model change, PR review, incremental safety, dashboard impact, audit, etc.), end the response with this structure:
+When acting as a specialist review (model change, PR review, incremental safety, dashboard impact, audit, etc.), end the response with this structure:
 
 ```text
-Verdict:        <safe to proceed | needs changes | blocked | split PR | docs-only OK>
-Risk level:     <low | medium | high>
-Files inspected: <list>
-Findings:       <bulleted; blocking issues first>
-Required validation: <commands from validation overlay, e.g. dbt-validation-commands.mdc>
-Recommended next action: <one concrete step>
+Verdict:               <safe to edit | safe for Civis testing | warehouse validation failed | ready to merge | blocked | split change | docs-only OK>
+Risk level:            <low | medium | high>
+Intent:                <what the change should accomplish>
+Grain/contract:        <current grain and effect of change>
+
+Files inspected:
+- <files actually opened>
+
+Findings:
+- <blocking first>
+
+Checks run:
+- PASS: dbt parse --no-partial-parse
+- FAIL: <command and concise error>
+- NOT RUN: dbt compile, no warehouse connection
+- NOT AVAILABLE: data reconciliation, requires Redshift
+
+Static Redshift review:
+- <confirmed risks | no findings | n/a (no SQL inspected)>
+- Confidence: <n/a | static only | compiled | executed>
+
+Downstream coverage:
+- <models, tests, exposures, Civis jobs, dashboards checked>
+- Unknown consumers: <anything outside the repo>
+
+Required warehouse validation:
+- <exact dbt commands>
+- <exact SQL queries and expected invariants>
+
+Recommended next action:
+- <one concrete step>
 ```
+
+PR review may add **Blocking issues** and **Suggested PR summary** under Findings.
+
+If the repo has `verify-ddm-dbt`, fill **Checks run** from `target/verify-ddm-dbt/report.md`. Do not invent PASS lines.
+
+## Verdicts
+
+| Verdict | Meaning |
+|---------|---------|
+| `safe to edit` | Plan/approval pause, or inspection complete, no files changed yet |
+| `safe for Civis testing` | Local checks passed; warehouse/Civis still required |
+| `warehouse validation failed` | Compile/run/test or SQL invariants failed |
+| `ready to merge` | Warehouse evidence in this session (or an equivalent Civis run) supports merge |
+| `blocked` | Cannot proceed without a decision or missing input |
+| `split change` | Scope mixes unrelated or high-risk work |
+| `docs-only OK` | Documentation-only; no model/YAML change |
+
+Do not use `safe to proceed`. Local review is not merge-ready.
 
 ## Field guidance
 
-- **Verdict** — merge/readiness decision for reviews; proceed/wait for approval for implementation tasks.
 - **Risk level** — high when grain, metrics, incrementals, identity joins, or dashboard contracts may change.
 - **Files inspected** — SQL, YAML, exposures, docs actually read — not inferred.
-- **Findings** — cite paths; separate blocking vs advisory.
-- **Required validation** — copy from repo validation overlay; add metric totals or dashboard checks when reporting models are touched.
-- **Recommended next action** — smallest next step (approve plan, run command, split PR, owner sign-off).
-
-PR Reviewer may add **Blocking issues** and **Suggested PR summary** under Findings when useful.
+- **Checks run** — commands actually executed this session, with status. Future work goes under **Required warehouse validation**.
+- **Static Redshift review / Confidence** — `n/a` when no SQL was inspected (docs/rules-only). Use `static only` only if `check_redshift_sql.py` / equivalent ran; `compiled` if compiled SQL was linted; `executed` only after warehouse `run`/`test`.
+- **Recommended next action** — smallest next step (run Civis command, fix FAIL, split PR, owner sign-off).
 
 ## No fake inspection
 
 - Do not list files as inspected unless you opened or searched them.
-- If validation was not run, say **Not run** — do not imply it passed.
+- If validation was not run, say **NOT RUN** or **NOT AVAILABLE** — do not imply it passed.
 - Do not infer downstream impact from filenames alone; trace dependencies, exposures, and consumers.
 - Separate **Inspected** from **Not inspected / needs follow-up** when coverage is incomplete.
 - Do not say "no impact" unless downstream dependencies and consumers were checked.
